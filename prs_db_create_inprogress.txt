@@ -1,0 +1,67 @@
+-- Drop and Create the Database, DDL
+
+drop database if exists prs_db;
+create database prs_db;
+use prs_db;
+
+-- DDL - Create Tables
+create table User (
+	ID				int 			primary key auto_increment,
+	UserName 	    VARCHAR(20)			not null unique,
+	Password 		VARCHAR(10) 	    not null,
+	FirstName 		VARCHAR(20) 	    not null,
+    LastName 	    VARCHAR(20) 		not null,
+	PhoneNumber		VARCHAR(12) 	    not null,
+	Email 			VARCHAR(75) 	    not null,
+	IsReviewer       TinyInt		    not null,
+	IsAdmin 		 TinyInt		    not null
+	);
+
+create table Vendor (
+	ID 				int 			not null primary key auto_increment,
+	Code 		    VARCHAR(10)		not null unique,
+	Name 			VARCHAR(255)	not null,
+	Address 		VARCHAR(255) 	not null,
+	City 		    VARCHAR(255)	not null,
+    State           VARCHAR(2)      not null,
+    Zip				VARCHAR(5)      not null,
+    PhoneNumber		VARCHAR(12)     not null,
+    Email			VARCHAR(100)    not null
+	);
+
+
+create table Request (
+	ID 				INT 			not null primary key auto_increment,
+	UserID		    INT 			not null,
+	Description		VARCHAR(100)	not null,
+	Justification   VARCHAR(255)    not null,
+    DateNeeded		DATE			not null,
+    DeliveryMode	VARCHAR(25)     not null,
+    Status			VARCHAR(25)     not null,
+    Total			DECIMAL(10,2)   not null,
+    SubmittedDate	DATETIME        not null,
+    ReasonForRejection VARCHAR(100),
+	FOREIGN KEY (UserID) REFERENCES user(ID)
+    );
+    
+    create table Product (
+	ID 				INT 			not null primary key auto_increment,
+	VendorID		    INT 		not null unique,
+	PartNumber		VARCHAR(50)	    not null unique,
+	Name            VARCHAR(150)    not null,
+    Price		    DECIMAL(10,2)   not null,
+    Unit      	    VARCHAR(255),
+    PhotoPath	    VARCHAR(255),
+    FOREIGN KEY (VendorID) REFERENCES vendor(ID),
+    CONSTRAINT vendor_part unique (VendorID, PartNumber)
+    );
+    
+    create table LineItem (
+	ID 				INT 			not null primary key auto_increment,
+	RequestID	    INT 		    not null unique,
+	ProductID		INT	            not null unique,
+	Quantity        INT             not null,
+    FOREIGN KEY (ProductID) REFERENCES product(ID),
+    FOREIGN KEY (RequestID) REFERENCES request(ID),
+    CONSTRAINT req_pdt unique (RequestID, ProductID)
+    );
